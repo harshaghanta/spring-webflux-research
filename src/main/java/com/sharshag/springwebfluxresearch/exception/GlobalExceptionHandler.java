@@ -2,6 +2,7 @@ package com.sharshag.springwebfluxresearch.exception;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Map.Entry;
 
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -13,7 +14,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -21,8 +22,10 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 @Order(-2)
 public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
@@ -44,6 +47,11 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         String query = request.uri().getQuery();
         ErrorAttributeOptions options = isTraceEnabled(query) ? ErrorAttributeOptions.of(Include.STACK_TRACE): ErrorAttributeOptions.defaults();
         Map<String, Object> errorAttributesMap = getErrorAttributes(request, options);
+    
+        for (Entry entry : errorAttributesMap.entrySet()) {
+            log.debug("format error rsponse: key: {}, value: {}", entry.getKey(), entry.getValue());;
+        }
+
         int status = (int) Optional.ofNullable(errorAttributesMap.get("status")).orElse(500);
         return ServerResponse
             .status(status)
@@ -52,7 +60,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private boolean isTraceEnabled(String query) {
-        return !StringUtils.isEmpty(query) && query.contains("trace=true");
+        return !ObjectUtils.isEmpty(query) && query.contains("trace=true");
     }
     
 }

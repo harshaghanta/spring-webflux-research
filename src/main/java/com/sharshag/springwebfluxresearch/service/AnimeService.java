@@ -8,12 +8,10 @@ import com.sharshag.springwebfluxresearch.domain.Anime;
 import com.sharshag.springwebfluxresearch.repository.AnimeRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class AnimeService {
     
@@ -31,5 +29,22 @@ public class AnimeService {
 
     public <T> Mono<T> monoResponseStatusNotFoundException() {
         return Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Anime not found"));
+    }
+
+    public Mono<Anime> save(Anime anime) {
+        Mono<Anime> save = animeRepository.save(anime);
+        return save;
+    }
+
+    public Mono<Void> update(Anime anime) {
+              
+        return findById(anime.getId())
+                .map(animeFound -> anime.withId(animeFound.getId()))
+                .flatMap(animeRepository::save)
+                .thenEmpty(Mono.empty());
+    }
+
+    public Mono<Void> deleteById(int id) {
+        return animeRepository.deleteById(id);
     }
 }
