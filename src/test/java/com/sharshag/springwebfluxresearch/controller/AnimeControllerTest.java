@@ -14,6 +14,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -130,24 +131,25 @@ public class AnimeControllerTest {
                 .expectSubscription()
                 .expectNext(animeToBeSaved)
                 .verifyComplete();
+                
 
     }
 
-    // @Test
-    // @DisplayName("saveAll returns MonoError when invalid")
-    // public void saveAll_ReturnMonoError_WhenInvalid() {
+    @Test
+    @DisplayName("saveAll returns MonoError when invalid")
+    public void saveAll_ReturnMonoError_WhenInvalid() {
 
-    //     Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
-    //     BDDMockito.when(animeServiceMock.saveAll(ArgumentMatchers.anyList()))
-    //             .thenReturn(Flux.fromIterable(List.of(animeToBeSaved, animeToBeSaved.withName(""))));
+        Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+        BDDMockito.when(animeServiceMock.saveAll(ArgumentMatchers.anyList()))
+                .thenReturn(Flux.just(animeToBeSaved).concatWith(Flux.error(new ResponseStatusException(HttpStatus.BAD_REQUEST))));
 
-    //     StepVerifier.create(animeController.save(List.of(animeToBeSaved, animeToBeSaved.withName(""))))
-    //             .expectSubscription()
-    //             .expectNext(animeToBeSaved)
-    //             .expectError(ResponseStatusException.class)
-    //             .verify();
+        StepVerifier.create(animeController.save(List.of(animeToBeSaved, animeToBeSaved.withName(""))))
+                .expectSubscription()
+                .expectNext(animeToBeSaved)
+                .expectError(ResponseStatusException.class)
+                .verify();
 
-    // }
+    }
 
     @Test
     @DisplayName("delete returns a Mono of Void when found or not found")
