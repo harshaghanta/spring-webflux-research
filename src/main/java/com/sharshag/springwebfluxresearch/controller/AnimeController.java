@@ -1,5 +1,7 @@
 package com.sharshag.springwebfluxresearch.controller;
 
+import java.util.List;
+
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,12 @@ public class AnimeController {
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<Anime> save(@Valid @RequestBody Anime anime) {
         return animeService.save(anime);
+    }
+
+    @PostMapping("/batch")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Flux<Anime> save(@RequestBody List<Anime> animes) {
+        return animeService.saveAll(animes);
     }
 
     @PutMapping("{id}")

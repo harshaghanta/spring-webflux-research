@@ -1,5 +1,6 @@
 package com.sharshag.springwebfluxresearch.controller;
 
+import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
@@ -9,10 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.sharshag.springwebfluxresearch.domain.Anime;
 import com.sharshag.springwebfluxresearch.service.AnimeService;
@@ -114,6 +117,37 @@ public class AnimeControllerTest {
                 .verifyComplete();
 
     }
+
+    @Test
+    @DisplayName("saveAll returns Flux of Anime when successful")
+    public void saveAll_ReturnFluxOfAnime_WhenSuccessful() {
+
+        Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+        BDDMockito.when(animeServiceMock.saveAll(List.of(animeToBeSaved)))
+                .thenReturn(Flux.fromIterable(List.of(animeToBeSaved)));
+
+        StepVerifier.create(animeController.save(List.of(animeToBeSaved)))
+                .expectSubscription()
+                .expectNext(animeToBeSaved)
+                .verifyComplete();
+
+    }
+
+    // @Test
+    // @DisplayName("saveAll returns MonoError when invalid")
+    // public void saveAll_ReturnMonoError_WhenInvalid() {
+
+    //     Anime animeToBeSaved = AnimeCreator.createAnimeToBeSaved();
+    //     BDDMockito.when(animeServiceMock.saveAll(ArgumentMatchers.anyList()))
+    //             .thenReturn(Flux.fromIterable(List.of(animeToBeSaved, animeToBeSaved.withName(""))));
+
+    //     StepVerifier.create(animeController.save(List.of(animeToBeSaved, animeToBeSaved.withName(""))))
+    //             .expectSubscription()
+    //             .expectNext(animeToBeSaved)
+    //             .expectError(ResponseStatusException.class)
+    //             .verify();
+
+    // }
 
     @Test
     @DisplayName("delete returns a Mono of Void when found or not found")

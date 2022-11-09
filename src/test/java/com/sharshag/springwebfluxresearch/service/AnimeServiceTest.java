@@ -1,14 +1,19 @@
 package com.sharshag.springwebfluxresearch.service;
 
+import static org.mockito.ArgumentMatchers.nullable;
+
+import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -163,6 +168,31 @@ public class AnimeServiceTest {
 
     }
 
+    @Test
+    public void saveAll_Returns_FluxOfAnime_WhenSuccessful() {
+        List<Anime> animes = List.of(anime, anime);
+        
+        BDDMockito.when(animeRepositoryMock.saveAll(animes)).thenReturn(Flux.fromIterable(animes));
+        
+        StepVerifier.create(animeService.saveAll(animes))
+            .expectSubscription()
+            .expectNextCount(2)
+            .verifyComplete();
+    }
+
+    @Test
+    public void saveAll_Returns_MonoError_WhenInvalid() {
+        List<Anime> animes = List.of(anime, anime.withName(""));
+        
+        BDDMockito.when(animeRepositoryMock.saveAll(ArgumentMatchers.anyIterable()))
+            .thenReturn(Flux.fromIterable(animes));
+        
+        StepVerifier.create(animeService.saveAll(animes))
+            .expectSubscription()
+            .expectNext(anime)
+            .expectError(ResponseStatusException.class)
+            .verify();
+    }
     
 
 }
