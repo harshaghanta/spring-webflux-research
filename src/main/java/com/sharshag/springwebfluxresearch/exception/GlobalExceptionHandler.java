@@ -1,8 +1,8 @@
 package com.sharshag.springwebfluxresearch.exception;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler extends AbstractErrorWebExceptionHandler {
         ErrorAttributeOptions options = isTraceEnabled(query) ? ErrorAttributeOptions.of(Include.STACK_TRACE): ErrorAttributeOptions.defaults();
         Map<String, Object> errorAttributesMap = getErrorAttributes(request, options);
     
-        for (Entry entry : errorAttributesMap.entrySet()) {
+        for (Entry<String, Object> entry : errorAttributesMap.entrySet()) {
             log.debug("format error rsponse: key: {}, value: {}", entry.getKey(), entry.getValue());;
         }
 
