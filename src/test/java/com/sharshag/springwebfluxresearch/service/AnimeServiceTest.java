@@ -1,12 +1,9 @@
 package com.sharshag.springwebfluxresearch.service;
 
-import static org.mockito.ArgumentMatchers.nullable;
-
 import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
-import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
