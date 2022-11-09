@@ -169,4 +169,49 @@ public class AnimeControllerIT {
             .jsonPath("$.status").isEqualTo(400);
             
     }
+
+    @Test
+    public void delete_ReturnsNoContent_WhenSuccessOrFail() {
+
+        BDDMockito.when(animeRepositoryMock.deleteById(1)).thenReturn(Mono.empty());
+
+        testClient.delete()
+            .uri("/animes/{id}", 1)
+            .exchange()
+            .expectStatus().isNoContent();
+    }
+
+    @Test
+    public void update_ReturnsNoContent_WhenSuccess() {
+
+        // Anime animeToBeUpdated = Anime.builder().id(5).name("Spiderman").build();
+
+        // BDDMockito.when(animeRepositoryMock.findById(1).thenReturn(Mono.just(animeToBeUpdated)));
+
+        Anime animeTobeUpdated = AnimeCreator.createValidAnime();
+        BDDMockito.when(animeRepositoryMock.save(animeTobeUpdated)).thenReturn(Mono.just(animeTobeUpdated));
+
+        testClient.put()
+            .uri("/animes/{id}", 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(animeTobeUpdated))            
+            .exchange()
+            .expectStatus()
+            .isNoContent();
+    }
+
+    @Test
+    public void update_ReturnsNoContent_WhenFail() {
+
+        BDDMockito.when(animeRepositoryMock.findById(1)).thenReturn(Mono.empty());        
+
+        testClient.put()
+            .uri("/animes/{id}", 1)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(BodyInserters.fromValue(anime))            
+            .exchange()
+            .expectStatus()
+            .isNotFound();
+    }
+
 }
