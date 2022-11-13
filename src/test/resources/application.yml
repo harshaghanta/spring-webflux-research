@@ -2,3 +2,8 @@ logging:
   level:
     org:
       springframework: INFO
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/postgres?schema=anime
+    username: root
+    password: root
